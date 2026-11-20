@@ -75,6 +75,7 @@ CONF_DEVICE_ID = "samsung_ac_device_id"
 CONF_DEVICE_ADDRESS = "address"
 CONF_DEVICE_ROOM_TEMPERATURE = "room_temperature"
 CONF_DEVICE_ROOM_TEMPERATURE_OFFSET = "room_temperature_offset"
+CONF_DEVICE_CURRENT_TEMPERATURE_SENSOR = "current_temperature_sensor"
 CONF_DEVICE_TARGET_TEMPERATURE = "target_temperature"
 CONF_DEVICE_WATER_OUTLET_TARGET = "water_outlet_target"
 CONF_DEVICE_OUTDOOR_TEMPERATURE = "outdoor_temperature"
@@ -293,6 +294,7 @@ DEVICE_SCHEMA = cv.Schema(
             state_class=STATE_CLASS_MEASUREMENT,
         ),
         cv.Optional(CONF_DEVICE_ROOM_TEMPERATURE_OFFSET): cv.float_,
+        cv.Optional(CONF_DEVICE_CURRENT_TEMPERATURE_SENSOR): cv.use_id(sensor.Sensor),
         cv.Optional(CONF_DEVICE_OUTDOOR_TEMPERATURE): sensor.sensor_schema(
             unit_of_measurement=UNIT_CELSIUS,
             accuracy_decimals=1,
@@ -648,6 +650,10 @@ async def to_code(config):
                     device[CONF_DEVICE_ROOM_TEMPERATURE_OFFSET]
                 )
             )
+
+        if CONF_DEVICE_CURRENT_TEMPERATURE_SENSOR in device:
+            src = await cg.get_variable(device[CONF_DEVICE_CURRENT_TEMPERATURE_SENSOR])
+            cg.add(var_dev.set_current_temperature_sensor(src))
 
         if CONF_DEVICE_WATER_TARGET_TEMPERATURE in device:
             conf = device[CONF_DEVICE_WATER_TARGET_TEMPERATURE]

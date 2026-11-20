@@ -271,11 +271,28 @@ namespace esphome
         room_temperature = sensor;
       }
 
+      // Optional external source for the climate's current temperature. When set,
+      // the climate reports this sensor (NaN -> unknown) and 0x4204 only feeds the
+      // room_temperature sensor. Useful when the room temperature is injected via
+      // 0x4203, where 0x4204 is no longer the room temperature.
+      sensor::Sensor *current_temperature_sensor{nullptr};
+
+      void set_current_temperature_sensor(sensor::Sensor *sensor)
+      {
+        current_temperature_sensor = sensor;
+        sensor->add_on_state_callback([this](float value)
+                                      {
+          if (climate == nullptr)
+            return;
+          climate->current_temperature = value;
+          climate->publish_state(); });
+      }
+
       void update_room_temperature(float value)
       {
         if (room_temperature != nullptr)
           room_temperature->publish_state(value + room_temperature_offset);
-        if (climate != nullptr)
+        if (climate != nullptr && current_temperature_sensor == nullptr)
         {
           climate->current_temperature = value + room_temperature_offset;
           climate->publish_state();

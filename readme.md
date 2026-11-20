@@ -1,5 +1,13 @@
 # ESPHome Samsung HVAC Integration
 
+> **Fork note (HA-Andreas):** this fork adds one optional, backwards-compatible per-device option, `current_temperature_sensor: <sensor id>`. When set, the climate entity reports that sensor as its current temperature (NaN → unknown) instead of NASA `0x4204`; `room_temperature` keeps showing `0x4204`. Without the option the component behaves exactly like upstream. Background: with room temperature injected via `0x4203`, `0x4204` in heat mode is a setpoint-anchored display value, not the room temperature (see upstream PR #406).
+>
+> ```yaml
+> devices:
+>   - address: "20.00.00"
+>     current_temperature_sensor: my_room_sensor
+> ```
+
 Welcome to the **ESPHome Samsung HVAC Integration** project! This project provides an [ESPHome](https://esphome.io/) component to integrate Samsung HVAC units (air conditioners or heat pumps) seamlessly into Home Assistant. Our goal is to empower users with comprehensive control and monitoring of their HVAC systems using modern, open-source tools.
 
 ## 🌟 Overview
